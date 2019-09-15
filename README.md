@@ -1,12 +1,3 @@
-# Link del Proyecto
-https://cwillromero.github.io
-
-
-
-
-
-
-
 # lms_ux
 
 ## Project setup
