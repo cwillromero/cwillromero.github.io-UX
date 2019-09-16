@@ -43,7 +43,6 @@ export default {
           console.log("aqui con ", doc.data());
           this.rolUser = doc.data().userType;
           this.emailUser = doc.data().email;
-
           if (this.rolUser === "Alumno") {
             firestore
               .collection("classes")
