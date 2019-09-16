@@ -38,18 +38,29 @@ const router = new Router({
       path: '/admin-clases',
       name: 'admin-clases',
       component: () => import('./views/AdminClases.vue')
+    },
+    {
+      path: '/user',
+      name: 'user',
+      component: () => import('./views/User.vue')
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('./views/Admin.vue')
     }
   ]
 });
 
-// router.beforeEach((to, from, next) => {
-//   if (to.path !== '/login') {
-//     const currentUser = firebase.auth().currentUser;
-//     if (!currentUser) {
-//       next({ path: '/login' });
-//     }
-//   }
-//   next();
-// });
+router.beforeEach((to, from, next) => {
+   if (to.path !== '/login') {
+     const currentUser = firebase.auth().currentUser;
+     if (!currentUser) {
+       console.log("estooy aqui?");
+       next({ path: '/login' });
+     }
+   }
+  next();
+});
 
 export default router;
