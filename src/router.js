@@ -34,6 +34,11 @@ const router = new Router({
       name: 'admin-usuarios',
       component: () => import('./views/UpdateDelete.vue')
     },
+    {
+      path: '/admin-clases',
+      name: 'admin-clases',
+      component: () => import('./views/AdminClases.vue')
+    }
   ]
 });
 

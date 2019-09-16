@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-toolbar dark prominent color="blue-grey darken-4">
-      <!--v-btn text>
+      <v-btn text>
         <v-icon>mdi-home</v-icon>Página Principal
-      </v-btn-->
+      </v-btn>
       <v-toolbar-title>Administración de Institituciones</v-toolbar-title>
     </v-toolbar>
     <v-container id="dropdown-example">
@@ -196,6 +196,7 @@ export default {
         this.formAble = 0;
         this.agregarAble = 1;
         this.eliminarAble = 1;
+        this.opcionSeleccionada = "agregar";
       }
     },
     eliminar: function() {
