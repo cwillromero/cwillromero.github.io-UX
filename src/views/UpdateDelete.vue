@@ -1,5 +1,11 @@
 <template>
   <div class="UpdateDelete">
+    <v-toolbar dark prominent color="blue-grey darken-4">
+      <!--v-btn text>
+        <v-icon>mdi-home</v-icon>Página Principal
+      </v-btn-->
+      <v-toolbar-title>Administración de Usuarios</v-toolbar-title>
+    </v-toolbar>
     <v-form ref="formulario" v-model="valid">
       <v-container>
         <v-row align="center">

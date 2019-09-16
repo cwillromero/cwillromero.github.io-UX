@@ -76,16 +76,18 @@ export default {
   },
   methods: {
     signIn() {
-      this.isLoading = true;
+      //this.isLoading = true;
       firebase
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
-          this.isLoading = false;
-          this.$router.push("/");
+          //this.isLoading = false;
+          //this.$router.push("/");
+          cosole.log("Seción Iniciada");
         })
         .catch(err => {
-          this.isLoading = false;
+          //this.isLoading = false;
+          cosole.log("Error Iniciado Sesión");
         });
     }
   }
