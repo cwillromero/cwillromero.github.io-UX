@@ -32,13 +32,7 @@
                   </router-link>
                 </v-flex>
                 <v-flex class="xs12">
-                  <v-btn
-                    class="full-width primary"
-                    type="submit"
-                    :disabled="!valid"
-                    tile
-                    @click="signIn()"
-                  >Ingresar</v-btn>
+                  <v-btn class="full-width primary" tile @click="signIn()">Ingresar</v-btn>
                 </v-flex>
               </v-flex>
             </v-row>
@@ -77,17 +71,39 @@ export default {
   methods: {
     signIn() {
       //this.isLoading = true;
+      console.log("Seción Iniciada aqui");
       firebase
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
           //this.isLoading = false;
-          this.$router.push("/");
-          cosole.log("Seción Iniciada");
+          //this.$router.push("/");
+          console.log("Seción Iniciada");
+
+          firestore
+            .collection("users")
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.docs.forEach(element => {
+                if (
+                  this.email === element.data().email &&
+                  element.data().password === this.password
+                ) {
+                  console.log("usuario unico aqui!!!!");
+                  if(element.data().userType === "Profesor"){
+                    this.$router.push("/user");
+                  }else if(element.data().userType === "Alumno"){
+                    this.$router.push("/user");
+                  }else if(element.data().userType === "Admin"){
+                    this.$router.push("/");
+                  }
+                }
+              });
+            });
         })
         .catch(err => {
           //this.isLoading = false;
-          cosole.log("Error Iniciado Sesión");
+          console.log("Error Iniciado Sesión");
         });
     }
   }
