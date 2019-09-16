@@ -25,14 +25,13 @@
                 ></v-text-field>
               </v-flex>
               <v-flex class="xs12 lg6 pa-2">
-                <v-text-field :rules="rules.firstName" v-model="firstName" label="Nombre"></v-text-field>
+                <v-text-field :rules="rules.name" v-model="firstName" label="Nombre"></v-text-field>
               </v-flex>
               <v-flex class="xs12 lg6 pa-2">
-                <v-text-field :rules="rules.lastName" v-model="lastName" label="Apellido"></v-text-field>
+                <v-text-field :rules="rules.name" v-model="lastName" label="Apellido"></v-text-field>
               </v-flex>
               <v-flex class="xs12 pa-2">
                 <v-textarea
-                  :rules="rules.aboutMe"
                   v-model="aboutMe"
                   rows="3"
                   no-resize
@@ -87,19 +86,17 @@ export default {
       items: ["Profesor", "Alumno"],
       rules: {
         email: [
-          v => !!v || "Requerido",
+          v => !!v || "Es un campo es requerido.",
           v => /.+@.+\..+/.test(v) || "No es un correo electrónico válido"
         ],
         password: [
-          v => (v.length > 0 ? true : "Requerido"),
+          v => (v.length > 0 ? true : "Es un campo es requerido."),
           v =>
             v.length >= 6
               ? true
               : "El password debe tener al menos 6 caracteres"
         ],
-        firstName: [v => v || "Requerido"],
-        lastName: [v => v || "Requerido"],
-        aboutMe: [v => v || "Requerido"]
+        name: [v => !!v || "Es un campo es requerido."],
       }
     };
   },

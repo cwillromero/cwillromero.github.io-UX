@@ -28,7 +28,12 @@ const router = new Router({
       path: '/admin-instituciones',
       name: 'admin-instituciones',
       component: () => import('./views/AdminInstituciones.vue')
-    }
+    },
+    {
+      path: '/admin-usuarios',
+      name: 'admin-usuarios',
+      component: () => import('./views/UpdateDelete.vue')
+    },
   ]
 });
 
