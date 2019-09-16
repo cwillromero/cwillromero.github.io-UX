@@ -95,7 +95,7 @@ export default {
                   }else if(element.data().userType === "Alumno"){
                     this.$router.push("/user");
                   }else if(element.data().userType === "Admin"){
-                    this.$router.push("/");
+                    this.$router.push("/admin");
                   }
                 }
               });
