@@ -23,6 +23,7 @@
               v-model="contrasenia"
               :rules="nameRules"
               :counter="20"
+              type="password"
               label="Contraseña"
               required
             ></v-text-field>

@@ -82,7 +82,7 @@ export default {
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
           //this.isLoading = false;
-          //this.$router.push("/");
+          this.$router.push("/");
           cosole.log("Seción Iniciada");
         })
         .catch(err => {
