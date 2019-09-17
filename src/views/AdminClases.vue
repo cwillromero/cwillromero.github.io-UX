@@ -321,7 +321,7 @@ export default {
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            this.clases.push(doc.data().nombre + "_" + doc.id);
+            this.clases.push(doc.data().nombre + "__________-" + doc.id);
             this.base.push({ id: doc.id, data: doc.data() });
           });
         })
@@ -359,7 +359,7 @@ export default {
     showClass: function() {
       this.alumnos_seleccionados = [];
       this.base.forEach(element => {
-        if (element.id === this.seleccionado.split("_")[1]) {
+        if (element.id === this.seleccionado.split("-")[1]) {
           this.nombre = element.data.nombre;
           this.grado = element.data.grado;
           this.seccion = element.data.seccion;
