@@ -236,9 +236,13 @@ export default {
       this.dropdownAble = 1;
       this.formAble = 0;
       this.nombre = "";
-      this.grado = "";
+      this.grado = 1;
+      this.anio = 2000;
       this.seccion = "";
-      this.encargado = "";
+      this.parcial = 1;
+      this.alumnos_seleccionados = [];
+      this.institucion = "";
+      this.docente = "";
       this.opcionSeleccionada = "agregar";
       this.editarAble = 1;
       this.eliminarAble = 1;
@@ -249,6 +253,7 @@ export default {
         this.snackbar = true;
       } else {
         this.formAble = 0;
+        this.dropdownAble = 1;
         this.agregarAble = 1;
         this.eliminarAble = 1;
       }
@@ -269,13 +274,15 @@ export default {
       if (
         this.nombre === "" ||
         this.grado === "" ||
-        this.grado === "0" ||
+        this.grado === 0 ||
         this.seccion === "" ||
         this.parcial === "" ||
-        this.parcial === "0" ||
+        this.parcial === 0 ||
         this.anio === "" ||
-        this.anio === "0" ||
-        this.alumnos_seleccionados.length === 0
+        this.anio === 0 ||
+        this.alumnos_seleccionados.length === 0 ||
+        this.institucion === "" ||
+        this.docente === ""
       ) {
         this.text = "No deben haber campos vacíos!";
         this.snackbar = true;
@@ -291,7 +298,7 @@ export default {
             this.text = "Esa Institución ya existe.";
             this.snackbar = true;
           } else {
-            this.addInstitucion();
+            this.addClass();
             this.dropdownAble = 0;
             this.formAble = 1;
           }
@@ -314,17 +321,7 @@ export default {
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            this.clases.push(
-              doc.data().nombre +
-                "-" +
-                doc.data().grado +
-                "-" +
-                doc.data().seccion +
-                "-" +
-                doc.data().parcial +
-                "-" +
-                doc.data().anio
-            );
+            this.clases.push(doc.data().nombre + "_" + doc.id);
             this.base.push({ id: doc.id, data: doc.data() });
           });
         })
@@ -362,12 +359,7 @@ export default {
     showClass: function() {
       this.alumnos_seleccionados = [];
       this.base.forEach(element => {
-        if (
-          element.data.grado === parseInt(this.seleccionado.split("-")[1]) &&
-          element.data.seccion === this.seleccionado.split("-")[2] &&
-          element.data.parcial === parseInt(this.seleccionado.split("-")[3]) &&
-          element.data.anio === parseInt(this.seleccionado.split("-")[4])
-        ) {
+        if (element.id === this.seleccionado.split("_")[1]) {
           this.nombre = element.data.nombre;
           this.grado = element.data.grado;
           this.seccion = element.data.seccion;
@@ -455,6 +447,7 @@ export default {
                   this.snackbar = true;
                   this.agregarAble = 0;
                   this.eliminarAble = 0;
+                  this.dropdownAble = 0;
                   firestore
                     .collection("classes")
                     .doc(this.idseleccionado)
@@ -471,6 +464,7 @@ export default {
                   this.snackbar = true;
                   this.agregarAble = 0;
                   this.eliminarAble = 0;
+                  this.dropdownAble = 0;
                 });
             })
             .catch(function(error) {
@@ -481,72 +475,101 @@ export default {
           console.log("Error getting institution: ", error);
         });
     },
-    addInstitucion: function() {
+    addClass: function() {
+      var my_i = "institutions/";
       firestore
         .collection("institutions")
-        .add({
-          nombre: this.nombre,
-          grado: this.grado,
-          seccion: this.seccion,
-          encargados: this.encargados
-        })
-        .then(docRef => {
-          console.log("Document written with ID: ", docRef.id);
-          this.text = "Institución agregada correctamente.";
-          this.snackColor = "green";
-          this.snackbar = true;
-          this.editarAble = 0;
-          this.eliminarAble = 0;
-        })
-        .catch(error => {
-          console.error("Error adding document: ", error);
-          this.text = "Error agregando Institución.";
-          this.snackbar = true;
-          this.editarAble = 0;
-          this.eliminarAble = 0;
-        });
-      this.nombre = "";
-      this.grado = "";
-      this.seccion = "";
-      this.encargado = "";
-      this.encargados = [];
-      this.getClasses();
-    },
-    deleteClass: function() {
-      this.dialog = false;
-      console.log(
-        this.seleccionado.split("-")[0] +
-          "," +
-          this.seleccionado.split("-")[1] +
-          "," +
-          this.seleccionado.split("-")[2] +
-          "," +
-          this.seleccionado.split("-")[3] +
-          "," +
-          this.seleccionado.split("-")[4]
-      );
-      /*firestore
-        .collection("classes")
-        .where("nombre", "==", this.seleccionado.split("-")[0])
+        .where("nombre", "==", this.institucion)
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            // doc.data() is never undefined for query doc snapshots
-            if (
-              doc.data().grado === parseInt(this.seleccionado.split("-")[1]) &&
-              doc.data().seccion === this.seleccionado.split("-")[2] &&
-              doc.data().parcial === parseInt(this.seleccionado.split("-")[3]) &&
-              doc.data().año === parseInt(this.seleccionado.split("-")[4])
-            ) {
-              this.idseleccionado = doc.id+"";
-              console.log(this.idseleccionado);
-            }
+            my_i += doc.id;
           });
+          var my_docente = "users/";
+          firestore
+            .collection("users")
+            .where("email", "==", this.docente)
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(doce => {
+                my_docente += doce.id;
+              });
+              var my_all = [];
+              this.alumnos_seleccionados.forEach(al => {
+                firestore
+                  .collection("users")
+                  .where("email", "==", al)
+                  .get()
+                  .then(querySnapshot => {
+                    querySnapshot.forEach(alu => {
+                      my_all.push(firestore.doc("users/" + alu.id));
+                      this.my_alumnos = my_all;
+                    });
+                  })
+                  .catch(function(error) {
+                    console.log("Error getting alumnos: ", error);
+                  });
+              });
+              firestore
+                .collection("classes")
+                .add({
+                  nombre: this.nombre,
+                  grado: parseInt(this.grado),
+                  seccion: this.seccion,
+                  parcial: parseInt(this.parcial),
+                  anio: parseInt(this.anio),
+                  institucion: firestore.doc(my_i),
+                  docente: firestore.doc(my_docente),
+                  alumnos: this.my_alumnos
+                })
+                .then(docRef => {
+                  console.log("Document written with ID: ", docRef.id);
+                  this.seleccionado =
+                    this.nombre +
+                    "-" +
+                    this.grado +
+                    "-" +
+                    this.seccion +
+                    "-" +
+                    this.parcial +
+                    "-" +
+                    this.anio;
+                  firestore
+                    .collection("classes")
+                    .doc(docRef.id)
+                    .update({
+                      alumnos: this.my_alumnos
+                    })
+                    .then(() => {
+                      this.getClasses();
+                      this.text = "Institución agregada correctamente.";
+                      this.snackColor = "green";
+                      this.snackbar = true;
+                      this.editarAble = 0;
+                      this.eliminarAble = 0;
+                      this.dropdownAble = 0;
+                      this.showClass();
+                    });
+                })
+                .catch(error => {
+                  console.error("Error adding document: ", error);
+                  this.text = "Error agregando Clase.";
+                  this.snackbar = true;
+                  this.editarAble = 0;
+                  this.eliminarAble = 0;
+                  this.dropdownAble = 0;
+                });
+            })
+            .catch(function(error) {
+              console.log("Error getting docente: ", error);
+            });
         })
         .catch(function(error) {
-          console.log("Error getting documents: ", error);
-        });*/
-
+          console.log("Error getting institution: ", error);
+        });
+    },
+    deleteClass: function() {
+      this.dialog = false;
       firestore
         .collection("classes")
         .doc(this.idseleccionado)
@@ -558,6 +581,16 @@ export default {
           this.snackbar = true;
           this.editarAble = 0;
           this.agregarAble = 0;
+          this.nombre = "";
+          this.grado = 1;
+          this.anio = 2000;
+          this.seccion = "";
+          this.parcial = 1;
+          this.alumnos_seleccionados = [];
+          this.institucion = "";
+          this.docente = "";
+          this.opcionSeleccionada = "agregar";
+          this.getClasses();
         })
         .catch(error => {
           console.error("Error deleting document: ", error);
@@ -566,12 +599,6 @@ export default {
           this.editarAble = 0;
           this.agregarAble = 0;
         });
-      this.nombre = "";
-      this.grado = "";
-      this.seccion = "";
-      this.encargado = "";
-      this.encargados = [];
-      this.getClasses();
     }
   }
 };
