@@ -188,6 +188,7 @@ export default {
     instituciones: [],
     alumnos_seleccionados: [],
     alumnos: [],
+    my_alumnos: [],
     docente: "",
     docentes: [],
     parcial: 0,
@@ -229,33 +230,6 @@ export default {
   }),
   mounted: function() {
     this.getClasses();
-    firebase
-      .firestore()
-      .collection("institutions")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          this.instituciones.push(doc.data().nombre);
-        });
-      })
-      .catch(function(error) {
-        console.log("Error getting institutions: ", error);
-      });
-    firestore
-      .collection("users")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          if (doc.data().userType == "Profesor") {
-            this.docentes.push(doc.data().email);
-          } else if (doc.data().userType == "Alumno") {
-            this.alumnos.push(doc.data().email);
-          }
-        });
-      })
-      .catch(function(error) {
-        console.log("Error getting documents: ", error);
-      });
   },
   methods: {
     agregar: function() {
@@ -328,16 +302,12 @@ export default {
         }
       }
     },
-    editEncargados: function() {
-      this.encargados = this.encargado.split(",");
-      console.log(this.encargado);
-    },
     getClasses: function() {
       this.alumnos = [];
+      this.my_alumnos = [];
       this.instituciones = [];
       this.base = [];
       this.clases = [];
-      this.isLoading = true;
       firebase
         .firestore()
         .collection("classes")
@@ -359,10 +329,38 @@ export default {
           });
         })
         .catch(function(error) {
+          console.log("Error getting Classes: ", error);
+        });
+      firebase
+        .firestore()
+        .collection("institutions")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            this.instituciones.push(doc.data().nombre);
+          });
+        })
+        .catch(function(error) {
+          console.log("Error getting Institutions: ", error);
+        });
+      firestore
+        .collection("users")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            if (doc.data().userType == "Profesor") {
+              this.docentes.push(doc.data().email);
+            } else if (doc.data().userType == "Alumno") {
+              this.alumnos.push(doc.data().email);
+            }
+          });
+        })
+        .catch(function(error) {
           console.log("Error getting documents: ", error);
         });
     },
     showClass: function() {
+      this.alumnos_seleccionados = [];
       this.base.forEach(element => {
         if (
           element.data.grado === parseInt(this.seleccionado.split("-")[1]) &&
@@ -390,7 +388,6 @@ export default {
             .then(doc => {
               this.docente = doc.data().email;
             });
-          this.alumnos_seleccionados = [];
           element.data.alumnos.forEach(i => {
             firestore
               .collection("users")
@@ -412,41 +409,79 @@ export default {
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             my_i += doc.id;
-            firestore
-              .collection("classes")
-              .doc(this.idseleccionado)
-              .update({
-                nombre: this.nombre,
-                grado: this.grado,
-                seccion: this.seccion,
-                anio: this.anio,
-                parcial: this.parcial,
-                institucion: firestore.doc(my_i)
-              })
-              .then(() => {
-                console.log("Document successfully updated!");
-                this.text = "Clase actualizada correctamente.";
-                this.snackColor = "green";
-                this.snackbar = true;
-                this.agregarAble = 0;
-                this.eliminarAble = 0;
-              })
-              .catch(error => {
-                console.error("Error updating document: ", error);
-                this.text = "Error actualizando Clase.";
-                this.snackbar = true;
-                this.agregarAble = 0;
-                this.eliminarAble = 0;
-              });
           });
+          var my_docente = "users/";
+          firestore
+            .collection("users")
+            .where("email", "==", this.docente)
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(doce => {
+                my_docente += doce.id;
+              });
+              var my_all = [];
+              this.alumnos_seleccionados.forEach(al => {
+                firestore
+                  .collection("users")
+                  .where("email", "==", al)
+                  .get()
+                  .then(querySnapshot => {
+                    querySnapshot.forEach(alu => {
+                      my_all.push(firestore.doc("users/" + alu.id));
+                      this.my_alumnos = my_all;
+                    });
+                  })
+                  .catch(function(error) {
+                    console.log("Error getting alumnos: ", error);
+                  });
+              });
+              firestore
+                .collection("classes")
+                .doc(this.idseleccionado)
+                .update({
+                  nombre: this.nombre,
+                  grado: parseInt(this.grado),
+                  seccion: this.seccion,
+                  anio: parseInt(this.anio),
+                  parcial: parseInt(this.parcial),
+                  institucion: firestore.doc(my_i),
+                  docente: firestore.doc(my_docente)
+                })
+                .then(() => {
+                  console.log(this.my_alumnos);
+                  console.log("Clase Actualizada!");
+                  this.text = "Clase actualizada correctamente.";
+                  this.snackColor = "green";
+                  this.snackbar = true;
+                  this.agregarAble = 0;
+                  this.eliminarAble = 0;
+                  firestore
+                    .collection("classes")
+                    .doc(this.idseleccionado)
+                    .update({
+                      alumnos: this.my_alumnos
+                    })
+                    .then(() => {
+                      this.getClasses();
+                    });
+                })
+                .catch(error => {
+                  console.error("Error updating Clase: ", error);
+                  this.text = "Error actualizando Clase.";
+                  this.snackbar = true;
+                  this.agregarAble = 0;
+                  this.eliminarAble = 0;
+                });
+            })
+            .catch(function(error) {
+              console.log("Error getting docente: ", error);
+            });
         })
         .catch(function(error) {
-          console.log("Error getting documents: ", error);
+          console.log("Error getting institution: ", error);
         });
-      this.getClasses();
     },
     addInstitucion: function() {
-      this.editEncargados();
       firestore
         .collection("institutions")
         .add({
