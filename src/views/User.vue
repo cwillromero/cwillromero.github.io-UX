@@ -5,7 +5,7 @@
 
     <Perfil :rol="rolUser" :email="emailUser" :clases="clasesUser"
             :clasesN="clasesNombres"/>
-    <Clase />
+    <Clase/>
     <Banner />
   </div>
 </template>
@@ -50,10 +50,12 @@ export default {
               .then(snap => {
                 snap.forEach(element => {
                   element.data().alumnos.forEach(element2 => {
-                    console.log("que es? ", element2._key.path.segments[6]);
                     if (element2._key.path.segments[6] === doc.id) {
                       this.clasesUser.push(element); 
-                      this.clasesNombres.push(element.data().nombre);
+                      this.clasesNombres.push({
+                        nombre: element.data().nombre,
+                        id: element.id
+                      });
                     }
                   });
                 });

@@ -21,9 +21,8 @@
           <v-divider></v-divider>
 
           <v-list dense nav>
-            <v-list-item v-for="item in $props.clasesN" :key="item" link>
-              <v-list-item-content> {{item}}
-              </v-list-item-content>
+            <v-list-item v-for="item in $props.clasesN" :key="item.id" link>
+              <v-list-item-content  @click="printName(item.id)">{{item.nombre}}</v-list-item-content>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
@@ -38,7 +37,7 @@
 import { firebase, firestore } from "../firebase";
 export default {
   //vuetify: new Vuetify(),
-  props: ["rol", "email", "clases","clasesN"],
+  props: ["rol", "email", "clases", "clasesN"],
   data: () => ({
     contenidoClases: [],
     right: null
@@ -56,6 +55,12 @@ export default {
           this.contenidoClases.push(snap.data());
         });*/
     });
+  },
+  methods: {
+    printName(id) {
+      localStorage.id = id;
+      console.log("yahhaha ",localStorage.id);
+    }
   }
 };
 </script>
