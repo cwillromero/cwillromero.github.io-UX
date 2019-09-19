@@ -21,6 +21,7 @@
       width="100%"
       class="blue-grey darken-4 white--text"
       @click="adminInstituciones()"
+      
       primary
     >
       <v-icon>mdi-sd</v-icon>Administrar Instituciones
