@@ -188,6 +188,7 @@ export default {
       const index = this.actividades.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
         this.actividades.splice(index, 1);
+        
     },
 
     close() {
