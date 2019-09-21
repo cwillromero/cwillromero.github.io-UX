@@ -2,9 +2,9 @@
   <div class="clase">
     <v-app id="inspire" class="tab">
       <v-tabs fixed-tabs background-color="indigo" dark>
-        <v-tab @change="content()">Contenido</v-tab>
-        <v-tab>Treas</v-tab>
-        <v-tab>Calificaciones</v-tab>
+        <v-tab @change="contenido()">Contenido</v-tab>
+        <v-tab @change="tareas()">Treas</v-tab>
+        <v-tab @change="calificaciones()">Calificaciones</v-tab>
       </v-tabs>
     </v-app>
 
@@ -55,9 +55,12 @@
             </v-dialog>
           </v-toolbar>
         </template>
-        <template v-slot:item.action="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">edit</v-icon>
-          <v-icon small @click="deleteItem(item)">delete</v-icon>
+        <template v-slot:item.action="{ item }" v-if="$props.conditionUser">
+          <v-icon small class="ma-2" @click="editItem(item)">edit</v-icon>
+          <v-icon small class="ma-2" @click="deleteItem(item)">delete</v-icon>
+        </template>
+        <template v-slot:item.action="{ item }" v-else>
+          pendiente
         </template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -70,6 +73,7 @@
 <script>
 import { firestore } from "../firebase";
 export default {
+  props : ['conditionUser'],
   data: () => ({
     bottomNav: 3,
     actividades: [],
@@ -79,7 +83,8 @@ export default {
       { text: "Descripcion", value: "descripcion" },
       { text: "Tipo", value: "tipo" },
       { text: "Ponderacion", value: "ponderacion" },
-      { text: "Envios", value: "envios", sortable: false }
+      { text: "Envios", value: "envios"},
+      {text: 'Actions', value: 'action', sortable: false} 
     ],
     desserts: [],
     editedIndex: -1,
@@ -118,12 +123,12 @@ export default {
     if (localStorage.id != localStorage.anterior) {
       console.log("cambio aqui el localS? ", localStorage.id);
       //this.initialize();
-      this.content();
+      this.contenido();
       localStorage.anterior = localStorage.id;
     }else{
       console.log("paso por aqui?");
       //this.initialize();
-      this.content();
+      this.contenido();
     }
   },
   /* teacher */
@@ -196,9 +201,15 @@ export default {
       this.close();
     },
 
-    content(){
+    contenido(){
       console.log("estoy en el content");
       this.initialize();
+    },
+    tareas(){
+      
+    },
+    calificacione(){
+
     }
   }
 };
