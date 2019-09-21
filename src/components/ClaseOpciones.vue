@@ -2,7 +2,7 @@
   <div class="clase">
     <v-app id="inspire" class="tab">
       <v-tabs fixed-tabs background-color="indigo" dark>
-        <v-tab>Contenido</v-tab>
+        <v-tab @change="content()">Contenido</v-tab>
         <v-tab>Treas</v-tab>
         <v-tab>Calificaciones</v-tab>
       </v-tabs>
@@ -115,28 +115,15 @@ export default {
   },
   mounted: function() {
 
-    if (localStorage.id != null) {
-      /* firestore
-        .collection("Actividad")
-        .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
-        .get()
-        .then(snap => {
-          snap.forEach(element => {
-            console.log("descripcion : ", element.data().classRoom.id);
-            this.actividades.push({
-              descripcion: element.data().descripcion,
-              envios: element.data().envios,
-              fechaCreacion: element.data().fechaCreacion,
-              fechaLimite: element.data().fechaLimite,
-              ponderacion: element.data().ponderacion,
-              tipo: element.data().tipo,
-              titulo: element.data().titulo
-            });
-          });
-        });
-*/
-      console.log("cambio aqui el localS? ", sessionStorage.id);
-      this.initialize();
+    if (localStorage.id != localStorage.anterior) {
+      console.log("cambio aqui el localS? ", localStorage.id);
+      //this.initialize();
+      this.content();
+      localStorage.anterior = localStorage.id;
+    }else{
+      console.log("paso por aqui?");
+      //this.initialize();
+      this.content();
     }
   },
   /* teacher */
@@ -207,6 +194,11 @@ export default {
         console.log("se supone estoy aqui",this.editItem);
       }
       this.close();
+    },
+
+    content(){
+      console.log("estoy en el content");
+      this.initialize();
     }
   }
 };

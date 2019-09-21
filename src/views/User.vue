@@ -71,13 +71,21 @@ export default {
                     element.data().docente._key.path.segments[6]
                   );
                   if (element.data().docente._key.path.segments[6] === doc.id) {
-                    this.clasesUser.push(element);
-                    this.clasesNombres.push(element.data().nombre);
+                    this.clasesUser.push(element); 
+                    this.clasesNombres.push({
+                      nombre: element.data().nombre,
+                      id: element.id
+                    });
                   }
                 });
               });
           }
         });
+        if( this.clasesNombres.length>0){
+          localStorage.id = this.clasesNombres[0].id;
+          localStorage.anterior = this.clasesNombres[0].id;
+          console.log("ID ???");
+        }
       });
   }
 };
