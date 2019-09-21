@@ -4,7 +4,7 @@
       <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab @change="contenido()">Contenido</v-tab>
         <v-tab @change="tareas()">Treas</v-tab>
-        <v-tab @change="calificaciones()">Calificaciones</v-tab>
+        <v-tab @change="calificaciones()">calificaciones</v-tab>
       </v-tabs>
     </v-app>
 
@@ -16,7 +16,7 @@
             <v-divider class="mx-4" inset vertical></v-divider>
             <div class="flex-grow-1"></div>
             <v-dialog v-model="dialog" max-width="500px">
-              <template v-slot:activator="{ on }">
+              <template v-slot:activator="{ on }" v-if="$props.conditionUser">
                 <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
               </template>
               <v-card>
@@ -34,12 +34,27 @@
                         <v-text-field v-model="editedItem.descripcion" label="descripcion"></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="4" md="4">
-                        <v-text-field v-model="editedItem.tipo" label="tipo"></v-text-field>
+                        <!--<v-text-field v-model="editedItem.tipo" label="tipo"></v-text-field>-->
+                        Tipo
+                        <v-select
+                          v-model="select"
+                          :hint="`${select.state}, ${select.abbr}`"
+                          :items="tipos"
+                          item-text="state"
+                          item-value="abbr"
+                          label="select"
+                          persistent-hint
+                          return-object
+                          single-line
+                          @change="cambiar(select.state)"
+                        ></v-select>
                       </v-col>
-                      <v-col cols="12" sm="4" md="4">
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="4" md="4" v-show="conditionShow">
                         <v-text-field v-model="editedItem.ponderacion" label="ponderacion"></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="6" md="4" v-show="conditionShow">
                         <v-text-field v-model="editedItem.envios" label="envios"></v-text-field>
                       </v-col>
                     </v-row>
@@ -59,9 +74,7 @@
           <v-icon small class="ma-2" @click="editItem(item)">edit</v-icon>
           <v-icon small class="ma-2" @click="deleteItem(item)">delete</v-icon>
         </template>
-        <template v-slot:item.action="{ item }" v-else>
-          pendiente
-        </template>
+        <template v-slot:item.action="{ item }" v-else>pendiente</template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
@@ -73,18 +86,21 @@
 <script>
 import { firestore } from "../firebase";
 export default {
-  props : ['conditionUser'],
+  props: ["conditionUser"],
   data: () => ({
     bottomNav: 3,
+    conditionShow: false,
     actividades: [],
+    select: { state: "1", abbr: "Tarea" },
+    tipos: [{ state: "1", abbr: "Tarea" }, { state: "2", abbr: "Anuncio" }],
     dialog: false,
     headers: [
       { text: "Titulo", value: "titulo" },
       { text: "Descripcion", value: "descripcion" },
       { text: "Tipo", value: "tipo" },
       { text: "Ponderacion", value: "ponderacion" },
-      { text: "Envios", value: "envios"},
-      {text: 'Actions', value: 'action', sortable: false} 
+      { text: "Envios", value: "envios" },
+      { text: "Actions", value: "action", sortable: false }
     ],
     desserts: [],
     editedIndex: -1,
@@ -119,13 +135,12 @@ export default {
     }
   },
   mounted: function() {
-
     if (localStorage.id != localStorage.anterior) {
       console.log("cambio aqui el localS? ", localStorage.id);
       //this.initialize();
       this.contenido();
       localStorage.anterior = localStorage.id;
-    }else{
+    } else {
       console.log("paso por aqui?");
       //this.initialize();
       this.contenido();
@@ -143,7 +158,7 @@ export default {
       val || this.close();
     }
   },
-/*
+  /*
   created() {
     this.initialize();
   },*/
@@ -151,7 +166,7 @@ export default {
   methods: {
     /*teacher*/
     initialize() {
-      this.actividades =[];
+      this.actividades = [];
       firestore
         .collection("Actividad")
         .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
@@ -180,7 +195,6 @@ export default {
       const index = this.actividades.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
         this.actividades.splice(index, 1);
-        
     },
 
     close() {
@@ -196,20 +210,31 @@ export default {
         Object.assign(this.actividades[this.editedIndex], this.editedItem);
       } else {
         this.actividades.push(this.editedItem);
-        console.log("se supone estoy aqui",this.editItem);
+        console.log("se supone estoy aqui", this.editItem);
       }
       this.close();
     },
 
-    contenido(){
+    contenido() {
       console.log("estoy en el content");
       this.initialize();
     },
-    tareas(){
-      
+    tareas() {
+      console.log("nada");
     },
-    calificacione(){
+    calificaciones() {
+      console.log("nada2");
+    },
 
+    cambiar(retVal) {
+      this.editedItem.tipo = retVal;
+      console.log(this.editedItem.tipo);
+      if (this.editedItem.tipo == 1) {
+        this.conditionShow = true;
+        console.log("entro??? conditoin");
+      } else {
+        this.conditionShow = false;
+      }
     }
   }
 };
