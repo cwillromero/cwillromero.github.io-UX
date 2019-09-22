@@ -1,19 +1,19 @@
 <template>
   <div>
-    <v-toolbar dark prominent color="blue-grey darken-4">
-      <v-btn text>
+    <v-toolbar dark prominent color="blue-grey darken-4" style="height:200px;">
+      <!--v-btn text>
         <v-icon>mdi-home</v-icon>Página Principal
-      </v-btn>
-      <v-toolbar-title>Administración de Institituciones</v-toolbar-title>
+      </v-btn-->
+      <v-toolbar-title >Administración de Institituciones</v-toolbar-title>
     </v-toolbar>
     <v-container id="dropdown-example">
       <v-row>
         <v-col cols="12" sm="12">
-          <p>Institución</p>
           <v-overflow-btn
             v-model="seleccionado"
             @change="showInstitucion()"
             class="my-2"
+            label="Instituciones"
             :items="instituciones"
             :disabled="dropdownAble == 1 ? true : false"
             target="#dropdown-example"
@@ -196,7 +196,7 @@ export default {
         this.formAble = 0;
         this.agregarAble = 1;
         this.eliminarAble = 1;
-        this.opcionSeleccionada = "agregar";
+        this.opcionSeleccionada="update";
       }
     },
     eliminar: function() {

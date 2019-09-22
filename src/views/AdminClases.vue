@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar dark prominent color="blue-grey darken-4">
+    <v-toolbar dark prominent color="blue-grey darken-4" style="height:200px;">
       <!--v-btn text>
         <v-icon>mdi-home</v-icon>Página Principal
       </v-btn-->
@@ -9,11 +9,11 @@
     <v-container id="dropdown-example">
       <v-row>
         <v-col cols="12" sm="12">
-          <p>Clases</p>
           <v-overflow-btn
             v-model="seleccionado"
             @change="showClass()"
             class="my-2"
+            label="Clases"
             :items="clases"
             :disabled="dropdownAble == 1 ? true : false"
             target="#dropdown-example"
@@ -163,8 +163,8 @@
     <div>
       <v-dialog v-model="dialog" max-width="290">
         <v-card>
-          <v-card-title class="headline">Eliminar definitivamente la Institución?</v-card-title>
-          <v-card-text>Al eliminar la Institución, la misma dejará de existir en la base de datos y ya no estará disponible.</v-card-text>
+          <v-card-title class="headline">Eliminar definitivamente la Clase?</v-card-title>
+          <v-card-text>Al eliminar la Clase, la misma dejará de existir en la base de datos y ya no estará disponible.</v-card-text>
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn color="red" text @click="dialog = false">Cancelar</v-btn>
@@ -288,7 +288,7 @@ export default {
         this.snackbar = true;
       } else {
         if (this.opcionSeleccionada === "agregar") {
-          var existe = false;
+          var existe = false; //ACORDATE DE ESTO
           this.clases.forEach(element => {
             if (element === this.nombre) {
               existe = true;
@@ -311,8 +311,10 @@ export default {
     },
     getClasses: function() {
       this.alumnos = [];
+      this.docentes=[];
       this.my_alumnos = [];
       this.instituciones = [];
+      this.alumnos_seleccionados = [];
       this.base = [];
       this.clases = [];
       firebase
@@ -456,6 +458,7 @@ export default {
                     })
                     .then(() => {
                       this.getClasses();
+                      this.showClass();
                     });
                 })
                 .catch(error => {
@@ -541,14 +544,22 @@ export default {
                       alumnos: this.my_alumnos
                     })
                     .then(() => {
-                      this.getClasses();
                       this.text = "Institución agregada correctamente.";
                       this.snackColor = "green";
                       this.snackbar = true;
                       this.editarAble = 0;
                       this.eliminarAble = 0;
                       this.dropdownAble = 0;
-                      this.showClass();
+                      this.nombre = "";
+                      this.grado = 1;
+                      this.anio = 2000;
+                      this.seccion = "";
+                      this.parcial = 1;
+                      this.alumnos_seleccionados = [];
+                      this.institucion = "";
+                      this.docente = "";
+                      this.opcionSeleccionada = "agregar";
+                      this.getClasses();
                     });
                 })
                 .catch(error => {
@@ -604,13 +615,3 @@ export default {
 };
 </script>
 
-<style>
-.v-card--reveal {
-  align-items: center;
-  bottom: 0;
-  justify-content: center;
-  opacity: 0.5;
-  position: absolute;
-  width: 100%;
-}
-</style>

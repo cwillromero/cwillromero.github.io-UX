@@ -1,46 +1,69 @@
 <template>
-  <div class="admin">
-    <h1>Contenido del admin</h1>
-    <v-btn
-      width="100%"
-      class="blue-grey darken-4 white--text"
-      @click="adminClases()"
-      primary
-    >
-      <v-icon>mdi-sd</v-icon>Administrar Clases
-    </v-btn>
-    <v-btn
-      width="100%"
-      class="blue-grey darken-4 white--text"
-      @click="adminUsuarios()"
-      primary
-    >
-      <v-icon>mdi-sd</v-icon>Administrar Usuarios
-    </v-btn>
-    <v-btn
-      width="100%"
-      class="blue-grey darken-4 white--text"
-      @click="adminInstituciones()"
-      
-      primary
-    >
-      <v-icon>mdi-sd</v-icon>Administrar Instituciones
-    </v-btn>
+  <div>
+    <v-card class="overflow-hidden">
+      <v-app-bar
+        absolute
+        color="#37474F"
+        dark
+        shrink-on-scroll
+        fade-img-on-scroll
+        src="https://picsum.photos/1920/1080?random"
+        scroll-target="#scrolling-techniques-2"
+      >
+        <template v-slot:img="{ props }">
+          <v-img v-bind="props" gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
+        </template>
+
+        <v-toolbar-title>Administración</v-toolbar-title>
+
+        <div class="flex-grow-1"></div>
+
+        <v-btn x-small text color="white">Cerrrar Cesión</v-btn>
+
+        <template v-slot:extension>
+          <v-tabs align-with-title background-color="transparent">
+            <v-tab @click="mostrar=1">Clases</v-tab>
+            <v-tab @click="mostrar=2">Usuarios</v-tab>
+            <v-tab @click="mostrar=3">Instituciones</v-tab>
+          </v-tabs>
+        </template>
+      </v-app-bar>
+      <v-sheet id="scrolling-techniques-2" class="overflow-y-auto" :max-height="altura">
+        <v-container>
+          <clases v-if="mostrar===1" />
+          <Usuarios v-if="mostrar===2" />
+          <Instituciones v-if="mostrar===3" />
+        </v-container>
+      </v-sheet>
+    </v-card>
   </div>
 </template>
 
 <script>
+import Clases from "./AdminClases";
+import Usuarios from "./UpdateDelete";
+import Instituciones from "./AdminInstituciones";
 export default {
-  methods: {
-    adminInstituciones() {
-      this.$router.push("/admin-instituciones");
-    },
-    adminClases() {
-      this.$router.push("/admin-clases");
-    },
-    adminUsuarios() {
-      this.$router.push("/admin-usuarios");
-    }
-  }
+  components: {
+    Clases,
+    Usuarios,
+    Instituciones
+  },
+  data: function() {
+    return {
+      mostrar: 1,
+      altura: window.innerHeight - 5
+    };
+  },
+  mounted: function() {
+    console.log(this.altura);
+  },
+  methods: {}
 };
 </script>
+
+<style>
+.principal {
+  position: relative;
+}
+</style>

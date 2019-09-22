@@ -7,20 +7,10 @@
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld";
-import Perfil from "./components/Perfil";
-import Clase from "./components/ClaseOpciones";
-import Banner from "./components/Banner";
 import { firebase } from "./firebase";
 
 export default {
   name: "App",
-  components: {
-    HelloWorld,
-    Perfil,
-    Clase,
-    Banner
-  },
   data: () => ({
     //
   })
