@@ -71,11 +71,31 @@
           </v-toolbar>
         </template>
         <template v-slot:item.action="{ item }" v-if="$props.conditionUser">
-          <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
-          <v-icon  @click="deleteItem(item)">mdi-delete</v-icon>
+          <v-icon @click="editItem(item)">mdi-pencil</v-icon>
+          <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
         </template>
         <template v-slot:item.action="{ item }" v-else>
-          <v-icon>mdi-text</v-icon>
+          
+            <v-dialog v-model="dialog2" width="500">
+              <template v-slot:activator="{on}">
+                <v-icon v-on="on">mdi-text</v-icon>
+              </template>
+
+
+              <v-card>
+                <v-card-title class="headline grey lighten-2" primary-title>Detalles - {{item.titulo}}</v-card-title>
+
+                <v-card-text> <br> {{item.descripcion}}</v-card-text>
+                  <v-divider></v-divider>
+
+                <v-card-actions>
+                  <div class="flex-grow-1"></div>
+                  <v-btn color="primary" text @click="dialog2 = false"> Cerrar</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          
+          
         </template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -96,6 +116,7 @@ export default {
     select: { state: "1", abbr: "Tarea" },
     tipos: [{ state: "1", abbr: "Tarea" }, { state: "2", abbr: "Anuncio" }],
     dialog: false,
+    dialog2: false,
     headers: [
       { text: "Titulo", value: "titulo" },
       { text: "Descripcion", value: "descripcion" },
@@ -205,7 +226,6 @@ export default {
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
-        
       }, 300);
     },
 
@@ -229,6 +249,7 @@ export default {
     calificaciones() {
       console.log("nada2");
     },
+    detalles() {},
 
     cambiar(retVal) {
       this.editedItem.tipo = retVal;
