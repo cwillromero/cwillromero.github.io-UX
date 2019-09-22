@@ -18,7 +18,7 @@
 
         <div class="flex-grow-1"></div>
 
-        <v-btn x-small text color="white">Cerrrar Cesión</v-btn>
+        <v-btn x-small text color="white" @click="cerrarSesion()">Cerrrar Cesión</v-btn>
 
         <template v-slot:extension>
           <v-tabs align-with-title background-color="transparent">
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { firebase} from "../firebase";
 import Clases from "./AdminClases";
 import Usuarios from "./UpdateDelete";
 import Instituciones from "./AdminInstituciones";
@@ -58,7 +59,12 @@ export default {
   mounted: function() {
     console.log(this.altura);
   },
-  methods: {}
+  methods: {
+    cerrarSesion(){
+      firebase.auth().signOut();
+      this.$router.push("/login");
+    }
+  }
 };
 </script>
 
