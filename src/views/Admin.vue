@@ -18,7 +18,7 @@
 
         <div class="flex-grow-1"></div>
 
-        <v-btn x-small text color="white">Cerrrar Cesión</v-btn>
+        <v-btn x-small text color="white" @click="dialog = true">Cerrar Sesión</v-btn>
 
         <template v-slot:extension>
           <v-tabs align-with-title background-color="transparent">
@@ -36,6 +36,22 @@
         </v-container>
       </v-sheet>
     </v-card>
+    <div class="text-center ma-2">
+      <v-snackbar v-model="snackbar">
+        {{ text }}
+        <v-btn :color="snackColor" text @click="snackbar = false">Close</v-btn>
+      </v-snackbar>
+    </div>
+    <v-dialog v-model="dialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Cerrar sesión?</v-card-title>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="red" text @click="dialog = false">Cancelar</v-btn>
+          <v-btn color="green darken-1" text @click="logout()">Aceptar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -52,13 +68,22 @@ export default {
   data: function() {
     return {
       mostrar: 1,
-      altura: window.innerHeight - 5
+      altura: window.innerHeight - 5,
+      snackColor: "green",
+      text: "Bienvenido!",
+      snackbar: true,
+      dialog : false
     };
   },
   mounted: function() {
     console.log(this.altura);
   },
-  methods: {}
+  methods: {
+    logout: function() {
+      this.dialog = false;
+      this.$router.push("/login");
+    }
+  }
 };
 </script>
 
