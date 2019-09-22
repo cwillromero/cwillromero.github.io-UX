@@ -71,10 +71,12 @@
           </v-toolbar>
         </template>
         <template v-slot:item.action="{ item }" v-if="$props.conditionUser">
-          <v-icon small class="ma-2" @click="editItem(item)">edit</v-icon>
-          <v-icon small class="ma-2" @click="deleteItem(item)">delete</v-icon>
+          <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
+          <v-icon  @click="deleteItem(item)">mdi-delete</v-icon>
         </template>
-        <template v-slot:item.action="{ item }" v-else>pendiente</template>
+        <template v-slot:item.action="{ item }" v-else>
+          <v-icon>mdi-text</v-icon>
+        </template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
@@ -186,6 +188,7 @@ export default {
     },
 
     editItem(item) {
+      this.conditionShow = true;
       this.editedIndex = this.actividades.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
