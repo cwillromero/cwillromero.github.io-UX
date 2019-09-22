@@ -153,9 +153,29 @@
                 <br />
                 <br />
                 <div v-if="item.tipo === 1">
-                  <input v-show="true" ref="inputUpload" type="file" @change="guardar()" />
+                  <input v-if="setShowAc" ref="inputUpload" type="file" @change="guardar()" />
                   <br />
-                  <v-btn color="blue darken-1" @click="enviar()">Enviar</v-btn>
+                  <v-btn v-if="setShowAc" color="warning" @click="enviar(item.id)">Enviar</v-btn>
+                  <v-alert
+                    v-model="alert"
+                    dismissible
+                    color="cyan"
+                    border="left"
+                    elevation="2"
+                    colored-border
+                  >
+                    <strong>Error!!!!</strong> No Enviado!
+                  </v-alert>
+                  <v-alert
+                    v-model="alert2"
+                    dismissible
+                    color="cyan"
+                    border="left"
+                    elevation="2"
+                    colored-border
+                  >
+                    <strong>Exito!!!!</strong> Enviado!
+                  </v-alert>
                 </div>
               </v-card-text>
               <v-divider></v-divider>
@@ -189,7 +209,9 @@ export default {
     date: new Date().toISOString().substr(0, 10),
     menu: false,
     modal: false,
-
+    setShowAc: true,
+    alert: false,
+    alert2: false,
     dateFinal: new Date().toISOString().substr(0, 10),
     menuFinal: false,
     modalFinal: false,
@@ -219,7 +241,8 @@ export default {
       envios: 0,
       fechaInicio: "",
       fechaFinal: "",
-      id: ""
+      id: "",
+      estado: ""
     },
     defaultItem: {
       titulo: "",
@@ -229,7 +252,8 @@ export default {
       envios: 0,
       fechaInicio: "",
       fechaFinal: "",
-      id: ""
+      id: "",
+      estado: ""
     }
   }),
 
@@ -259,13 +283,6 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
-    /*
-    computedDateFormattedMomentjs() {
-      return this.date ? moment(this.date).format("dddd, MMMM Do YYYY") : "";
-    },
-    computedDateFormattedDatefns() {
-      return this.date ? format(this.date, "dddd, MMMM Do YYYY") : "";
-    }*/
   },
   mounted: function() {
     this.initialize();
@@ -312,7 +329,7 @@ export default {
       this.conditionShow = true;
       this.editedIndex = this.actividades.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log("item?? ",this.editedItem);
+      console.log("item?? ", this.editedItem);
       this.dialog = true;
     },
 
@@ -320,6 +337,10 @@ export default {
       const index = this.actividades.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
         this.actividades.splice(index, 1);
+      firestore
+        .collection("Actividad")
+        .doc(item.id)
+        .delete();
     },
 
     close() {
@@ -330,11 +351,35 @@ export default {
       }, 300);
     },
 
-    save1() {/*
-      if (this.editedIndex > -1) {
-        Object.assign(this.actividades[this.editedIndex], this.editedItem);
-        console.log("entro alsave -1 ");
-      } else {*/
+    save1() {
+      /*var digito = this.editedItem.fechaInicio.split("-");
+        console.log("deberia ser ultimo digito ",digito[2]);
+        */
+      if (this.editedIndex === -1) {
+        var adjuntosN = [];
+        console.log("agregar");
+        //Object.assign(this.actividades[this.editedIndex], this.editedItem);
+        //console.log("uno nuevo ", this.editedItem.titulo);
+        firestore
+          .collection("Actividad")
+          .add({
+            adjuntos: adjuntosN,
+            classRoom: firestore.doc("classes/" + localStorage.id),
+            titulo: this.editedItem.titulo,
+            descripcion: this.editedItem.descripcion,
+            envios: this.editedItem.envios,
+            fechaCreacion: this.editedItem.fechaInicio,
+            fechaLimite: this.editedItem.fechaFinal,
+            tipo: parseInt(this.editedItem.tipo),
+            ponderacion: parseInt(this.editedItem.ponderacion)
+          })
+          .then(() => {
+            this.initialize();
+          })
+          .catch(() => {
+            console.log("errror");
+          });
+      } else {
         firestore
           .collection("Actividad")
           .doc(this.editedItem.id)
@@ -350,12 +395,15 @@ export default {
           .then(() => {
             console.log("se actualiza en la base");
             this.initialize();
+            this.alert2 = true;
           })
           .catch(function(error) {
             console.log("Error getting docente: ", error);
+            this.alert = true;
           });
         console.log("se supone estoy aqui", this.editItem);
-      //}
+      }
+
       this.close();
     },
 
@@ -386,19 +434,28 @@ export default {
       console.log("file??? ", file);
       this.archivo = file;
     },
-    enviar() {
+    enviar(id) {
       // Create a root reference
       var storageRef = firebase.storage().ref();
 
       // Create a reference to 'mountains.jpg'
-      var mountainsRef = storageRef.child("mountains.jpg");
+      var mountainsRef = storageRef.child(this.archivo.name);
 
       // Create a reference to 'images/mountains.jpg'
-      var mountainImagesRef = storageRef.child("images/mountains.jpg");
+      var mountainImagesRef = storageRef.child(
+        "archivos/" + id + "-" + localStorage.idAlumno + "-" + this.archivo.name
+      );
 
-      mountainImagesRef.put(this.archivo).then(function(snapshot) {
-        console.log("Uploaded a blob or file!");
-      });
+      mountainImagesRef
+        .put(this.archivo)
+        .then(() => {
+          console.log("Uploaded a blob or file!");
+          this.setShowAc = false;
+          this.alert2 = true;
+        })
+        .catch(() => {
+          this.alert = true;
+        });
     }
   }
 };

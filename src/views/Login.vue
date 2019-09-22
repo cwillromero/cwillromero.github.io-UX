@@ -92,6 +92,7 @@ export default {
                   }else if(element.data().userType === "Alumno"){
                     this.$router.push("/user");
                     localStorage.isTeacher = false;
+                    localStorage.idAlumno = element.id;
                     sessionStorage.rol = "Alumno";
                   }else if(element.data().userType === "Admin"){
                     this.$router.push("/admin");
