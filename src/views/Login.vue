@@ -26,11 +26,6 @@
             </v-row>
             <v-row>
               <v-flex class="sm12">
-                <v-flex class="xs12 pb-2">
-                  <router-link to="/register">
-                    <div class="d-flex justify-center">¿No tienes usuario aún? Regístrate</div>
-                  </router-link>
-                </v-flex>
                 <v-flex class="xs12">
                   <v-btn class="full-width primary" tile @click="signIn()">Ingresar</v-btn>
                 </v-flex>
