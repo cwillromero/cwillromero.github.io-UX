@@ -92,9 +92,11 @@ export default {
                   console.log("usuario unico aqui!!!!");
                   if(element.data().userType === "Profesor"){
                     sessionStorage.rol = "Profesor";
+                    localStorage.isTeacher = true;
                     this.$router.push("/user");
                   }else if(element.data().userType === "Alumno"){
                     this.$router.push("/user");
+                    localStorage.isTeacher = false;
                     sessionStorage.rol = "Alumno";
                   }else if(element.data().userType === "Admin"){
                     this.$router.push("/admin");

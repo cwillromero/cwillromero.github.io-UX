@@ -5,7 +5,7 @@
 
     <Perfil :rol="rolUser" :email="emailUser" :clases="clasesUser"
             :clasesN="clasesNombres"/>
-    <Clase/>
+    <Clase :conditionUser="condition"/>
     <Banner />
   </div>
 </template>
@@ -28,7 +28,8 @@ export default {
       rolUser: "",
       emailUser: "",
       clasesUser:[], /*clases, elementos como tal*/ 
-      clasesNombres:[] /*unicamente los nombres de las clases*/
+      clasesNombres:[], /*unicamente los nombres de las clases*/
+      condition: false
     };
   },
   mounted: function() {
@@ -44,6 +45,7 @@ export default {
           this.rolUser = doc.data().userType;
           this.emailUser = doc.data().email;
           if (this.rolUser === "Alumno") {
+            this.condition = false
             firestore
               .collection("classes")
               .get()
@@ -61,6 +63,7 @@ export default {
                 });
               });
           } else if (this.rolUser === "Profesor") {
+            this.condition = true;
             firestore
               .collection("classes")
               .get()
@@ -71,13 +74,21 @@ export default {
                     element.data().docente._key.path.segments[6]
                   );
                   if (element.data().docente._key.path.segments[6] === doc.id) {
-                    this.clasesUser.push(element);
-                    this.clasesNombres.push(element.data().nombre);
+                    this.clasesUser.push(element); 
+                    this.clasesNombres.push({
+                      nombre: element.data().nombre,
+                      id: element.id
+                    });
                   }
                 });
               });
           }
         });
+        if( this.clasesNombres.length>0){
+          localStorage.id = this.clasesNombres[0].id;
+          localStorage.anterior = this.clasesNombres[0].id;
+          console.log("ID ???");
+        }
       });
   }
 };
