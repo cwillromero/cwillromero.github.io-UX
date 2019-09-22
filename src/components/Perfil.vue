@@ -22,13 +22,12 @@
 
           <v-list dense nav>
             <v-list-item v-for="item in $props.clasesN" :key="item.id" link>
-              <v-list-item-content  @click="printName(item.id)">{{item.nombre}}</v-list-item-content>
+              <v-list-item-content @click="printName(item.id)">{{item.nombre}}</v-list-item-content>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </v-card>
     </v-app>
-
   </div>
 </template>
 
@@ -36,31 +35,22 @@
 
 <script>
 import { firebase, firestore } from "../firebase";
+import store from "../store";
 export default {
   //vuetify: new Vuetify(),
   props: ["rol", "email", "clases", "clasesN"],
   data: () => ({
-    contenidoClases: [],
+    contenidoClases:[],
     right: null
   }),
   mounted: function() {
-    this.$props.clases.forEach(element => {
-      console.log("mi elemento. ", element.id);
-      /*firestore
-        .collection("classes")
-        .doc(element.id)
-        .get()
-        .then(snap => {
-          console.log("deberia ", snap.data().nombre);
-          this.items.push(snap.data().nombre);
-          this.contenidoClases.push(snap.data());
-        });*/
-    });
+    
   },
   methods: {
-    printName(id) {
+    printName(id,nombre) {
       localStorage.id = id;
-      console.log("yahhaha ",localStorage.id);
+      console.log("yahhaha ", localStorage.id);
+      store.commit('updating', localStorage.id);
     }
   }
 };
@@ -72,6 +62,7 @@ export default {
   left: 0%;
   top: 0%;
   width: 20%;
+
 }
 
 .imgPerfil {
@@ -87,6 +78,6 @@ export default {
 }
 
 .rol {
-  font-size: 10px;
+  font-size: 15px;
 }
 </style>

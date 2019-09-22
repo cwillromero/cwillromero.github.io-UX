@@ -1,18 +1,18 @@
 <template>
   <div class="clase">
-    <v-app id="inspire" class="tab">
-      <v-tabs fixed-tabs background-color="indigo" dark>
-        <v-tab @change="contenido()">Contenido</v-tab>
-        <v-tab @change="tareas()">Treas</v-tab>
-        <v-tab @change="calificaciones()">calificaciones</v-tab>
-      </v-tabs>
-    </v-app>
+    <v-toolbar>
+      <v-toolbar-items>
+        <v-btn @click="contenido" text>Contenido</v-btn>
+        <v-btn @click="tareas">Tareas</v-btn>
+        <v-btn @click="calificaciones" text>Calificaciones</v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
 
     <div class="contenidoV">
       <v-data-table :headers="headers" :items="actividades" sort-by="calories" class="elevation-1">
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <v-toolbar-title>Contenido</v-toolbar-title>
+            <v-toolbar-title>Contenido {{score}}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <div class="flex-grow-1"></div>
             <v-dialog v-model="dialog" max-width="500px">
@@ -75,27 +75,26 @@
           <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
         </template>
         <template v-slot:item.action="{ item }" v-else>
-          
-            <v-dialog v-model="dialog2" width="500">
-              <template v-slot:activator="{on}">
-                <v-icon v-on="on">mdi-text</v-icon>
-              </template>
+          <v-dialog v-model="dialog2" width="500">
+            <template v-slot:activator="{on}">
+              <v-icon v-on="on">mdi-text</v-icon>
+            </template>
 
+            <v-card>
+              <v-card-title class="headline grey lighten-2" primary-title>Detalles - {{item.titulo}}</v-card-title>
 
-              <v-card>
-                <v-card-title class="headline grey lighten-2" primary-title>Detalles - {{item.titulo}}</v-card-title>
+              <v-card-text>
+                <br />
+                {{item.descripcion}}
+              </v-card-text>
+              <v-divider></v-divider>
 
-                <v-card-text> <br> {{item.descripcion}}</v-card-text>
-                  <v-divider></v-divider>
-
-                <v-card-actions>
-                  <div class="flex-grow-1"></div>
-                  <v-btn color="primary" text @click="dialog2 = false"> Cerrar</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          
-          
+              <v-card-actions>
+                <div class="flex-grow-1"></div>
+                <v-btn color="primary" text @click="dialog2 = false">Cerrar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -107,6 +106,7 @@
 
 <script>
 import { firestore } from "../firebase";
+import store from "../store";
 export default {
   props: ["conditionUser"],
   data: () => ({
@@ -155,26 +155,25 @@ export default {
         case 3:
           return "indigo";
       }
-    }
-  },
-  mounted: function() {
-    if (localStorage.id != localStorage.anterior) {
-      console.log("cambio aqui el localS? ", localStorage.id);
+    },
+    score() {
+      //localStorage.id = store.getters.score;
       //this.initialize();
-      this.contenido();
-      localStorage.anterior = localStorage.id;
-    } else {
-      console.log("paso por aqui?");
-      //this.initialize();
-      this.contenido();
-    }
-  },
-  /* teacher */
-  computed: {
+      if (store.getters.score != localStorage.anterior) {
+        console.log("cambio aqui el localS? ", localStorage.id);
+        this.initialize();
+        localStorage.anterior = localStorage.id;
+      }
+      return "";
+    },
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
   },
+  mounted: function() {
+    this.initialize();
+  },
+  /* teacher */
 
   watch: {
     dialog(val) {
@@ -188,6 +187,7 @@ export default {
 
   methods: {
     /*teacher*/
+
     initialize() {
       this.actividades = [];
       firestore
@@ -196,7 +196,7 @@ export default {
         .get()
         .then(snap => {
           snap.forEach(element => {
-            console.log("descripcion : ", element.data().classRoom.id);
+            console.log("descripcion");
             this.actividades.push({
               titulo: element.data().titulo,
               descripcion: element.data().descripcion,
