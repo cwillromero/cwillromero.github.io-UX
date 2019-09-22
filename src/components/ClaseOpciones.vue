@@ -57,6 +57,70 @@
                       <v-col cols="12" sm="6" md="4" v-show="conditionShow">
                         <v-text-field v-model="editedItem.envios" label="envios"></v-text-field>
                       </v-col>
+                      <input v-show="true" ref="inputUpload" type="file" />
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-menu
+                          ref="menu"
+                          v-model="menu"
+                          :close-on-content-click="false"
+                          :return-value.sync="editedItem.fechaInicio"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                          min-width="290px"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              v-model="editedItem.fechaInicio"
+                              label="Fecha Inicio"
+                              readonly
+                              v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker v-model="editedItem.fechaInicio" no-title scrollable>
+                            <div class="flex-grow-1"></div>
+                            <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
+                            <v-btn
+                              text
+                              color="primary"
+                              @click="$refs.menu.save(editedItem.fechaInicio)"
+                            >OK</v-btn>
+                          </v-date-picker>
+                        </v-menu>
+                      </v-col>
+
+                      <v-col cols="12" sm="6" md="4">
+                        <v-menu
+                          ref="menuFinal"
+                          v-model="menuFinal"
+                          :close-on-content-click="false"
+                          :return-value.sync="editedItem.fechaFinal"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                          min-width="290px"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              v-model="editedItem.fechaFinal"
+                              label="Fecha Final"
+                              readonly
+                              v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker v-model="editedItem.fechaFinal" no-title scrollable>
+                            <div class="flex-grow-1"></div>
+                            <v-btn text color="primary" @click="menuFinal = false">Cancel</v-btn>
+                            <v-btn
+                              text
+                              color="primary"
+                              @click="$refs.menuFinal.save(editedItem.fechaFinal)"
+                            >OK</v-btn>
+                          </v-date-picker>
+                        </v-menu>
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -64,7 +128,7 @@
                 <v-card-actions>
                   <div class="flex-grow-1"></div>
                   <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                  <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                  <v-btn color="blue darken-1" text @click="save1">Save</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -86,6 +150,13 @@
               <v-card-text>
                 <br />
                 {{item.descripcion}}
+                <br />
+                <br />
+                <div v-if="item.tipo === 1">
+                  <input v-show="true" ref="inputUpload" type="file" @change="guardar()" />
+                  <br />
+                  <v-btn color="blue darken-1" @click="enviar()">Enviar</v-btn>
+                </div>
               </v-card-text>
               <v-divider></v-divider>
 
@@ -105,18 +176,31 @@
 </template>
 
 <script>
-import { firestore } from "../firebase";
+/*
+import moment from "moment";
+import format from "date-fns/format";*/
+import { firestore, firebase } from "../firebase";
 import store from "../store";
 export default {
   props: ["conditionUser"],
   data: () => ({
     bottomNav: 3,
+    archivo: "",
+    date: new Date().toISOString().substr(0, 10),
+    menu: false,
+    modal: false,
+
+    dateFinal: new Date().toISOString().substr(0, 10),
+    menuFinal: false,
+    modalFinal: false,
+
     conditionShow: false,
     actividades: [],
     select: { state: "1", abbr: "Tarea" },
     tipos: [{ state: "1", abbr: "Tarea" }, { state: "2", abbr: "Anuncio" }],
     dialog: false,
     dialog2: false,
+    picker: new Date().toISOString().substr(0, 10),
     headers: [
       { text: "Titulo", value: "titulo" },
       { text: "Descripcion", value: "descripcion" },
@@ -132,14 +216,20 @@ export default {
       descripcion: "",
       tipo: 0,
       ponderacion: 0,
-      envios: 0
+      envios: 0,
+      fechaInicio: "",
+      fechaFinal: "",
+      id: ""
     },
     defaultItem: {
       titulo: "",
       descripcion: "",
       tipo: 0,
       ponderacion: 0,
-      envios: 0
+      envios: 0,
+      fechaInicio: "",
+      fechaFinal: "",
+      id: ""
     }
   }),
 
@@ -164,11 +254,18 @@ export default {
         this.initialize();
         localStorage.anterior = localStorage.id;
       }
-      return "";
+      return store.getters.getName;
     },
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
+    /*
+    computedDateFormattedMomentjs() {
+      return this.date ? moment(this.date).format("dddd, MMMM Do YYYY") : "";
+    },
+    computedDateFormattedDatefns() {
+      return this.date ? format(this.date, "dddd, MMMM Do YYYY") : "";
+    }*/
   },
   mounted: function() {
     this.initialize();
@@ -202,7 +299,10 @@ export default {
               descripcion: element.data().descripcion,
               tipo: element.data().tipo,
               ponderacion: element.data().ponderacion,
-              envios: element.data().envios
+              envios: element.data().envios,
+              fechaInicio: element.data().fechaCreacion,
+              fechaFinal: element.data().fechaLimite,
+              id: element.id
             });
           });
         });
@@ -212,6 +312,7 @@ export default {
       this.conditionShow = true;
       this.editedIndex = this.actividades.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      console.log("item?? ",this.editedItem);
       this.dialog = true;
     },
 
@@ -229,13 +330,32 @@ export default {
       }, 300);
     },
 
-    save() {
+    save1() {/*
       if (this.editedIndex > -1) {
         Object.assign(this.actividades[this.editedIndex], this.editedItem);
-      } else {
-        this.actividades.push(this.editedItem);
+        console.log("entro alsave -1 ");
+      } else {*/
+        firestore
+          .collection("Actividad")
+          .doc(this.editedItem.id)
+          .update({
+            titulo: this.editedItem.titulo,
+            descripcion: this.editedItem.descripcion,
+            envios: this.editedItem.envios,
+            fechaCreacion: this.editedItem.fechaInicio,
+            fechaLimite: this.editedItem.fechaFinal,
+            tipo: parseInt(this.editedItem.tipo),
+            ponderacion: parseInt(this.editedItem.ponderacion)
+          })
+          .then(() => {
+            console.log("se actualiza en la base");
+            this.initialize();
+          })
+          .catch(function(error) {
+            console.log("Error getting docente: ", error);
+          });
         console.log("se supone estoy aqui", this.editItem);
-      }
+      //}
       this.close();
     },
 
@@ -260,6 +380,25 @@ export default {
       } else {
         this.conditionShow = false;
       }
+    },
+    guardar() {
+      var file = event.target.files[0]; // use the Blob or File API
+      console.log("file??? ", file);
+      this.archivo = file;
+    },
+    enviar() {
+      // Create a root reference
+      var storageRef = firebase.storage().ref();
+
+      // Create a reference to 'mountains.jpg'
+      var mountainsRef = storageRef.child("mountains.jpg");
+
+      // Create a reference to 'images/mountains.jpg'
+      var mountainImagesRef = storageRef.child("images/mountains.jpg");
+
+      mountainImagesRef.put(this.archivo).then(function(snapshot) {
+        console.log("Uploaded a blob or file!");
+      });
     }
   }
 };

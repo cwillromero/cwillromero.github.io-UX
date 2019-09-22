@@ -83,12 +83,9 @@ export default {
                 });
               });
           }
+
         });
-        if( this.clasesNombres.length>0){
-          localStorage.id = this.clasesNombres[0].id;
-          localStorage.anterior = this.clasesNombres[0].id;
-          console.log("ID ???");
-        }
+        
       });
   }
 };

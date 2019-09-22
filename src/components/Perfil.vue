@@ -22,7 +22,7 @@
 
           <v-list dense nav>
             <v-list-item v-for="item in $props.clasesN" :key="item.id" link>
-              <v-list-item-content @click="printName(item.id)">{{item.nombre}}</v-list-item-content>
+              <v-list-item-content @click="printName(item.id,item.nombre)">{{item.nombre}}</v-list-item-content>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
@@ -49,8 +49,10 @@ export default {
   methods: {
     printName(id,nombre) {
       localStorage.id = id;
+      localStorage.name = nombre;
       console.log("yahhaha ", localStorage.id);
       store.commit('updating', localStorage.id);
+      store.commit('updatingName', nombre);
     }
   }
 };
