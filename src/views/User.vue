@@ -6,22 +6,19 @@
     <Perfil :rol="rolUser" :email="emailUser" :clases="clasesUser"
             :clasesN="clasesNombres"/>
     <Clase :conditionUser="condition"/>
-    <Banner />
   </div>
 </template>
 
 <script>
 import Perfil from "../components/Perfil";
 import Clase from "../components/ClaseOpciones";
-import Banner from "../components/Banner";
 import { firebase, firestore } from "../firebase";
 
 export default {
   name: "User",
   components: {
     Perfil,
-    Clase,
-    Banner
+    Clase
   },
   data: function() {
     return {

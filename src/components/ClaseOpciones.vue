@@ -1,18 +1,46 @@
 <template>
   <div class="clase">
+      <v-app-bar
+        absolute
+        color="#37474F"
+        dark
+        shrink-on-scroll
+        fade-img-on-scroll
+        src="https://picsum.photos/1920/1080?random"
+        scroll-target="#scrolling-techniques-2"
+      >
+        <template v-slot:img="{ props }">
+          <v-img v-bind="props" gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
+        </template>
+
+        <v-toolbar-title>{{score}}</v-toolbar-title>
+
+        <div class="flex-grow-1"></div>
+
+        <v-btn x-small text color="white" @click="cerrarSesion()">Cerrrar Cesión</v-btn>
+
+        <template v-slot:extension>
+          <v-tabs align-with-title background-color="transparent">
+            <v-tab @click="contenido">Contenido</v-tab>
+            <v-tab @click="tareas">Tareas</v-tab>
+            <v-tab @click="calificaciones">Calificaciones</v-tab>
+          </v-tabs>
+        </template>
+      </v-app-bar>
+<!--
     <v-toolbar>
       <v-toolbar-items>
         <v-btn @click="contenido" text>Contenido</v-btn>
         <v-btn @click="tareas">Tareas</v-btn>
         <v-btn @click="calificaciones" text>Calificaciones</v-btn>
       </v-toolbar-items>
-    </v-toolbar>
+    </v-toolbar>-->
 
     <div class="contenidoV">
       <v-data-table :headers="headers" :items="actividades" sort-by="calories" class="elevation-1">
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <v-toolbar-title>Contenido {{score}}</v-toolbar-title>
+            <v-toolbar-title>Contenido </v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <div class="flex-grow-1"></div>
             <v-dialog v-model="dialog" max-width="500px">
@@ -456,6 +484,10 @@ export default {
         .catch(() => {
           this.alert = true;
         });
+    },
+    cerrarSesion(){
+      firebase.auth().signOut();
+      this.$router.push("/login");
     }
   }
 };
@@ -465,10 +497,11 @@ export default {
 .clase {
   position: absolute;
   left: 20%;
-  top: 30%;
   width: 80%;
-  height: 12% !important;
+  height: 100% !important;
+  top: 0%;
   /*border: solid red 2px;*/
+  overflow: auto;
 }
 
 .clase v-btn {
@@ -479,9 +512,10 @@ export default {
   height: 70%;
 }
 
+
 .contenidoV {
   position: relative;
-  top: 0%;
+  top: 33.5%;
 }
 </style>
 
