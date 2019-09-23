@@ -1,46 +1,39 @@
 <template>
   <div class="clase">
-      <v-app-bar
-        absolute
-        color="#37474F"
-        dark
-        shrink-on-scroll
-        fade-img-on-scroll
-        src="https://picsum.photos/1920/1080?random"
-        scroll-target="#scrolling-techniques-2"
-      >
-        <template v-slot:img="{ props }">
-          <v-img v-bind="props" gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
-        </template>
+    <v-app-bar
+      absolute
+      color="#37474F"
+      dark
+      shrink-on-scroll
+      fade-img-on-scroll
+      src="https://picsum.photos/1920/1080?random"
+      scroll-target="#scrolling-techniques-2"
+    >
+      <template v-slot:img="{ props }">
+        <v-img v-bind="props" gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
+      </template>
 
-        <v-toolbar-title>{{score}}</v-toolbar-title>
+      <v-toolbar-title>{{score}}</v-toolbar-title>
 
-        <div class="flex-grow-1"></div>
+      <div class="flex-grow-1"></div>
 
-        <v-btn x-small text color="white" @click="cerrarSesion()">Cerrrar Cesión</v-btn>
+      <v-btn x-small text color="white" @click="cerrarSesion()">Cerrrar Cesión</v-btn>
 
-        <template v-slot:extension>
-          <v-tabs align-with-title background-color="transparent">
-            <v-tab @click="contenido">Contenido</v-tab>
-            <v-tab @click="tareas">Tareas</v-tab>
-            <v-tab @click="calificaciones">Calificaciones</v-tab>
-          </v-tabs>
-        </template>
-      </v-app-bar>
-<!--
-    <v-toolbar>
-      <v-toolbar-items>
-        <v-btn @click="contenido" text>Contenido</v-btn>
-        <v-btn @click="tareas">Tareas</v-btn>
-        <v-btn @click="calificaciones" text>Calificaciones</v-btn>
-      </v-toolbar-items>
-    </v-toolbar>-->
+      <template v-slot:extension>
+        <v-tabs align-with-title background-color="transparent">
+          <v-tab @click="contenido">Contenido</v-tab>
+          <v-tab @click="tareas">Tareas</v-tab>
+          <v-tab @click="calificaciones">Calificaciones</v-tab>
+          <v-tab @click="calendario">Calendario</v-tab>
+        </v-tabs>
+      </template>
+    </v-app-bar>
 
-    <div class="contenidoV">
+    <div class="contenidoV" v-show="contenidoShow">
       <v-data-table :headers="headers" :items="actividades" sort-by="calories" class="elevation-1">
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <v-toolbar-title>Contenido </v-toolbar-title>
+            <v-toolbar-title>Contenido</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <div class="flex-grow-1"></div>
             <v-dialog v-model="dialog" max-width="500px">
@@ -169,21 +162,27 @@
         <template v-slot:item.action="{ item }" v-else>
           <v-dialog v-model="dialog2" width="500">
             <template v-slot:activator="{on}">
-              <v-icon v-on="on">mdi-text</v-icon>
+              <v-icon v-on="on" @click="algo(item)">mdi-text</v-icon>
             </template>
 
             <v-card>
-              <v-card-title class="headline grey lighten-2" primary-title>Detalles - {{item.titulo}}</v-card-title>
+              <v-card-title class="headline grey lighten-2" primary-title>Detalles - {{tituloTem}}</v-card-title>
 
               <v-card-text>
                 <br />
-                {{item.descripcion}}
+                {{descripcionTem}}
                 <br />
                 <br />
                 <div v-if="item.tipo === 1">
-                  <input v-if="setShowAc" ref="inputUpload" type="file" @change="guardar()" />
+                  <input v-if="enviosTem>0" ref="inputUpload" type="file" @change="guardar()" />
                   <br />
-                  <v-btn v-if="setShowAc" color="warning" @click="enviar(item.id)">Enviar</v-btn>
+                  <v-btn
+                    v-if="enviosTem>0"
+                    class="ma-2"
+                    outlined
+                    color="indigo"
+                    @click="enviar(idTem)"
+                  >Enviar</v-btn>
                   <v-alert
                     v-model="alert"
                     dismissible
@@ -210,7 +209,7 @@
 
               <v-card-actions>
                 <div class="flex-grow-1"></div>
-                <v-btn color="primary" text @click="dialog2 = false">Cerrar</v-btn>
+                <v-btn color="primary" text @click="cerrarDetalles">Cerrar</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -219,6 +218,29 @@
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
+    </div>
+
+    <div v-show="tareasShow" class="contenidoV">
+      <div v-for="item in tareasClase" :key="item.titulo">
+        <v-card>
+          <v-card-text>
+            <p class="display-1 text--primary">{{item.titulo}}</p>
+            <div class="text--primary">
+              Descripcion
+              <br />
+              {{item.descripcion}}
+            </div>
+          </v-card-text>
+        </v-card>
+        <br />
+      </div>
+    </div>
+
+    <div v-show="calendarioShow" class="contenidoV">
+      <br><br>
+      <v-sheet max-width="600">
+        <v-calendar type="month" now="2019-09-23" value="2019-09-23" :events="events"></v-calendar>
+      </v-sheet>
     </div>
   </div>
 </template>
@@ -243,8 +265,17 @@ export default {
     dateFinal: new Date().toISOString().substr(0, 10),
     menuFinal: false,
     modalFinal: false,
-
+    descripcionTem: "",
+    tituloTem: "",
+    idTem: "",
+    enviosTem: 0,
     conditionShow: false,
+    tareasShow: false,
+    contenidoShow: true,
+    tareasClase: [],
+    calendarioShow: false,
+    events: [],
+
     actividades: [],
     select: { state: "1", abbr: "Tarea" },
     tipos: [{ state: "1", abbr: "Tarea" }, { state: "2", abbr: "Anuncio" }],
@@ -303,6 +334,8 @@ export default {
       //this.initialize();
       if (store.getters.score != localStorage.anterior) {
         console.log("cambio aqui el localS? ", localStorage.id);
+        /*this.calendario();
+        this.tareas();*/
         this.initialize();
         localStorage.anterior = localStorage.id;
       }
@@ -332,25 +365,32 @@ export default {
 
     initialize() {
       this.actividades = [];
-      firestore
-        .collection("Actividad")
-        .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
-        .get()
-        .then(snap => {
-          snap.forEach(element => {
-            console.log("descripcion");
-            this.actividades.push({
-              titulo: element.data().titulo,
-              descripcion: element.data().descripcion,
-              tipo: element.data().tipo,
-              ponderacion: element.data().ponderacion,
-              envios: element.data().envios,
-              fechaInicio: element.data().fechaCreacion,
-              fechaFinal: element.data().fechaLimite,
-              id: element.id
+      this.events = [],
+        firestore
+          .collection("Actividad")
+          .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
+          .get()
+          .then(snap => {
+            snap.forEach(element => {
+              console.log("descripcion");
+              this.actividades.push({
+                titulo: element.data().titulo,
+                descripcion: element.data().descripcion,
+                tipo: element.data().tipo,
+                ponderacion: element.data().ponderacion,
+                envios: element.data().envios,
+                fechaInicio: element.data().fechaCreacion,
+                fechaFinal: element.data().fechaLimite,
+                id: element.id
+              });
+
+              this.events.push({
+                name: element.data().titulo,
+                start: element.data().fechaCreacion,
+                end: element.data().fechaLimite
+              });
             });
           });
-        });
     },
 
     editItem(item) {
@@ -438,9 +478,38 @@ export default {
     contenido() {
       console.log("estoy en el content");
       this.initialize();
+      this.tareasShow = false;
+      this.contenidoShow = true;
+      this.calendarioShow = false;
+    },
+    calendario() {
+      this.tareasShow = false;
+      this.contenidoShow = false;
+      this.calendarioShow = true;
     },
     tareas() {
       console.log("nada");
+      this.contenidoShow = false;
+      this.tareasShow = true;
+      this.calendarioShow = false;
+
+      firestore
+        .collection("Actividad")
+        .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
+        .get()
+        .then(snap => {
+          this.tareasClase = [];
+          snap.forEach(element => {
+            if (element.data().tipo === 1) {
+              this.tareasClase.push({
+                titulo: element.data().titulo,
+                descripcion: element.data().descripcion
+              });
+
+              console.log("esta aqui tareas=??");
+            }
+          });
+        });
     },
     calificaciones() {
       console.log("nada2");
@@ -471,7 +540,12 @@ export default {
 
       // Create a reference to 'images/mountains.jpg'
       var mountainImagesRef = storageRef.child(
-        "archivos/" + id + "-" + localStorage.idAlumno + "-" + this.archivo.name
+        "archivos/" +
+          this.idTem +
+          "-" +
+          localStorage.idAlumno +
+          "-" +
+          this.archivo.name
       );
 
       mountainImagesRef
@@ -479,15 +553,35 @@ export default {
         .then(() => {
           console.log("Uploaded a blob or file!");
           this.setShowAc = false;
+
+          firestore
+            .collection("Actividad")
+            .doc(this.idTem)
+            .update({
+              envios: this.enviosTem - 1
+            })
+            .then(() => {});
           this.alert2 = true;
         })
         .catch(() => {
           this.alert = true;
         });
     },
-    cerrarSesion(){
+    cerrarSesion() {
       firebase.auth().signOut();
       this.$router.push("/login");
+    },
+    algo(item) {
+      console.log("aqui que hay??? ", item);
+      this.descripcionTem = item.descripcion;
+      this.tituloTem = item.titulo;
+      this.idTem = item.id;
+      this.enviosTem = item.envios;
+      console.log("cuantos envios", this.enviosTem);
+    },
+    cerrarDetalles() {
+      this.dialog2 = false;
+      this.initialize();
     }
   }
 };
@@ -511,7 +605,6 @@ export default {
 .tab {
   height: 70%;
 }
-
 
 .contenidoV {
   position: relative;
