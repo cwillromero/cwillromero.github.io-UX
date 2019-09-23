@@ -257,10 +257,10 @@
 
     <div v-show="calendarioShow" class="contenidoV">
       <br />
-      <br />
+      <br /><center>
       <v-sheet max-width="600">
         <v-calendar type="month" now="2019-09-23" value="2019-09-23" :events="events"></v-calendar>
-      </v-sheet>
+      </v-sheet></center>
     </div>
 
     <div v-if="conditionUser" v-show="calificacionesShow" class="contenidoV">
