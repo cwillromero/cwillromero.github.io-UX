@@ -23,8 +23,27 @@
         <v-tabs align-with-title background-color="transparent">
           <v-tab @click="contenido">Contenido</v-tab>
           <v-tab @click="tareas">Tareas</v-tab>
-          <v-tab @click="calificaciones">Calificaciones</v-tab>
+          <v-tab v-if="!$props.conditionUser" @click="calificaciones">Calificar</v-tab>
+          <v-tab v-else @click="calificaciones">Calificaciones</v-tab>
+
           <v-tab @click="calendario">Calendario</v-tab>
+          <v-tab v-if="!$props.conditionUser" @click="notificaciones">
+            <v-badge color="green" overlap>
+              <template v-slot:badge>
+                <span v-if="messages > 0">{{ messages }}</span>
+              </template>
+              <v-icon large>mdi-email</v-icon>
+            </v-badge>
+          </v-tab>
+          <v-tab v-else @click="notificaciones">
+            Notificaciones 
+            <v-badge color="green" overlap>
+              <template v-slot:badge>
+                <span v-if="messages2 > 0">{{ messages2 }}</span>
+              </template>
+              <v-icon small large>mdi-email</v-icon>
+            </v-badge>
+          </v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
@@ -237,7 +256,8 @@
     </div>
 
     <div v-show="calendarioShow" class="contenidoV">
-      <br><br>
+      <br />
+      <br />
       <v-sheet max-width="600">
         <v-calendar type="month" now="2019-09-23" value="2019-09-23" :events="events"></v-calendar>
       </v-sheet>
@@ -275,6 +295,8 @@ export default {
     tareasClase: [],
     calendarioShow: false,
     events: [],
+    messages: 0,
+    messages2: 0,
 
     actividades: [],
     select: { state: "1", abbr: "Tarea" },
@@ -365,7 +387,7 @@ export default {
 
     initialize() {
       this.actividades = [];
-      this.events = [],
+      (this.events = []),
         firestore
           .collection("Actividad")
           .where("classRoom", "==", firestore.doc("classes/" + localStorage.id))
@@ -582,6 +604,9 @@ export default {
     cerrarDetalles() {
       this.dialog2 = false;
       this.initialize();
+    },
+    notificaciones() {
+      console.log("notificaciones");
     }
   }
 };
