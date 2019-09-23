@@ -186,6 +186,7 @@ export default {
     seccion: "",
     institucion: "",
     instituciones: [],
+    idInst: [],
     alumnos_seleccionados: [],
     alumnos: [],
     my_alumnos: [],
@@ -256,6 +257,7 @@ export default {
         this.dropdownAble = 1;
         this.agregarAble = 1;
         this.eliminarAble = 1;
+        this.opcionSeleccionada = "update";
       }
     },
     eliminar: function() {
@@ -288,16 +290,31 @@ export default {
         this.snackbar = true;
       } else {
         if (this.opcionSeleccionada === "agregar") {
-          var existe = false; //ACORDATE DE ESTO
-          this.clases.forEach(element => {
-            if (element === this.nombre) {
+          var existe = false;
+          var insti = "";
+          this.idInst.forEach(el => {
+            if (this.institucion === el.data) {
+              insti = el.id;
+            }
+          });
+          this.base.forEach(element => {
+            if (
+              element.data.nombre === this.nombre &&
+              String(element.data.institucion.id) === insti &&
+              element.data.seccion === this.seccion &&
+              element.data.anio === this.anio &&
+              element.data.parcial === this.parcial &&
+              element.data.grado === this.grado
+            ) {
               existe = true;
+              console.log("Cumple If");
             }
           });
           if (existe === true) {
-            this.text = "Esa Institución ya existe.";
+            this.text = "Esa Clase ya existe.";
             this.snackbar = true;
           } else {
+            console.log("Else");
             this.addClass();
             this.dropdownAble = 0;
             this.formAble = 1;
@@ -311,7 +328,7 @@ export default {
     },
     getClasses: function() {
       this.alumnos = [];
-      this.docentes=[];
+      this.docentes = [];
       this.my_alumnos = [];
       this.instituciones = [];
       this.alumnos_seleccionados = [];
@@ -337,6 +354,7 @@ export default {
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             this.instituciones.push(doc.data().nombre);
+            this.idInst.push({ id: doc.id, data: doc.data().nombre });
           });
         })
         .catch(function(error) {

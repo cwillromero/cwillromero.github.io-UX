@@ -33,7 +33,7 @@
       <v-data-table :headers="headers" :items="actividades" sort-by="calories" class="elevation-1">
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <v-toolbar-title>Contenido</v-toolbar-title>
+            <v-toolbar-title>Contenido {{score}}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <div class="flex-grow-1"></div>
             <v-dialog v-model="dialog" max-width="500px">
