@@ -1,15 +1,23 @@
 <template>
-  <div class="full-height">
+  <div
+    class="full-height"
+    v-bind:style="{ 'background-image': 'url(' + 'https://picsum.photos/1920/1080?random' + ')' }"
+  >
     <v-overlay :value="isLoading">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
     <div class="d-flex justify-center align-center full-height">
-      <v-card class="pa-2 d-flex align-center login-card animated fadeInDown faster">
+      <v-card
+        class="pa-2 d-flex align-center login-card animated fadeInDown faster"
+        :elevation="24"
+      >
         <v-container>
-          <div class="d-flex justify-center title">¡Ingresa!</div>
+          <div class="d-flex justify-center title">
+            <strong class="indigo--text text--lighten-1">Iniciar Sesión</strong>
+          </div>
           <v-form v-model="valid">
             <v-row class="d-flex justify-center">
-              <v-icon class="photo-icon">mdi-account-circle</v-icon>
+              <v-icon class="photo-icon" color="indigo">mdi-account-box</v-icon>
             </v-row>
             <v-row>
               <v-flex class="xs12 pa-2">
@@ -21,13 +29,14 @@
                   type="password"
                   label="Contraseña"
                   :rules="rules.password"
+                  @keyup.enter="signIn()"
                 ></v-text-field>
               </v-flex>
             </v-row>
             <v-row>
               <v-flex class="sm12">
                 <v-flex class="xs12">
-                  <v-btn class="full-width primary" tile @click="signIn()">Ingresar</v-btn>
+                  <v-btn class="full-width" color="indigo" dark tile @click="signIn()">Log In</v-btn>
                 </v-flex>
               </v-flex>
             </v-row>
@@ -35,6 +44,10 @@
         </v-container>
       </v-card>
     </div>
+    <v-snackbar v-model="snackbar">
+      {{ text }}
+      <v-btn color="red" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -48,6 +61,8 @@ export default {
       valid: false,
       email: "",
       password: "",
+      snackbar: false,
+      text : "Usuario o Contraseña incorrectos, intente de nuevo.",
       rules: {
         email: [
           v => !!v || "Requerido",
@@ -85,16 +100,16 @@ export default {
                   element.data().password === this.password
                 ) {
                   console.log("usuario unico aqui!!!!");
-                  if(element.data().userType === "Profesor"){
+                  if (element.data().userType === "Profesor") {
                     sessionStorage.rol = "Profesor";
                     localStorage.isTeacher = true;
                     this.$router.push("/user");
-                  }else if(element.data().userType === "Alumno"){
+                  } else if (element.data().userType === "Alumno") {
                     this.$router.push("/user");
                     localStorage.isTeacher = false;
                     localStorage.idAlumno = element.id;
                     sessionStorage.rol = "Alumno";
-                  }else if(element.data().userType === "Admin"){
+                  } else if (element.data().userType === "Admin") {
                     this.$router.push("/admin");
                     sessionStorage.rol = "Admin";
                   }
@@ -103,7 +118,9 @@ export default {
             });
         })
         .catch(err => {
-          //this.isLoading = false;
+          this.snackbar=true;
+          this.password="";
+          this.email="";
           console.log("Error Iniciado Sesión");
         });
     }
