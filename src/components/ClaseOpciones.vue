@@ -263,16 +263,43 @@
       </v-sheet>
     </div>
 
-    <div v-show="calificacionesShow" class="contenidoV">
+    <div v-if="conditionUser" v-show="calificacionesShow" class="contenidoV">
       calificaciones
-      <v-row v-for="alumno in alumnosClase" :key="alumno.id">
-      <v-col> {{alumno.id}}</v-col>
-      <v-col v-for="actividad in actividades" :key="actividad.id"> {{actividad.titulo}}
-        
-        <v-text-field :disabled="!conditionUser" v-model="actividad.ponderacion"> </v-text-field>
-        </v-col>  
+      <v-row  v-for="alumno in alumnosClase" :key="alumno.id">
+        <v-col>{{alumno.id}}</v-col>
+        <v-col v-for="actividad in actividades" :key="actividad.id">
+          {{actividad.titulo}}
+          <v-text-field :disabled="!conditionUser" v-model="actividad.ponderacion"></v-text-field>
+        </v-col>
       </v-row>
+
     </div>
+
+    <div v-else v-show="calificacionesShow" class="contenidoV">
+      <v-row>
+        <v-col> <center>Actividad</center>
+        </v-col>
+
+        <v-col> <center>Calificación</center>
+        </v-col>
+      </v-row>
+
+      <div v-for="actividad in actividades" :key="actividad.id">
+        <v-row  v-if="actividad.tipo==1">
+          <v-col>
+          <center>{{actividad.titulo}}</center>
+          </v-col>
+          <v-col>
+            <center>
+          <v-text-field :disabled="!conditionUser" v-model="actividad.ponderacion"></v-text-field>
+          </center>
+          </v-col>
+        </v-row>
+      </div>
+      
+    </div>
+
+
   </div>
 </template>
 
@@ -554,25 +581,36 @@ export default {
       this.calendarioShow = false;
       this.tareasShow = false;
       this.calificacionesShow = true;
+
       firestore
         .collection("classes")
         .get()
         .then(snap => {
           this.alumnosClase = [];
           snap.forEach(element => {
-            if(element.id === localStorage.id){
-              console.log(element.data().alumnos);
-              element.data().alumnos.forEach(alum =>{
-                console.log("id por alumno ", alum.id);
-
-                this.alumnosClase.push({
-                  id: alum.id
-                });
+            if (element.id === localStorage.id) {
+              
+              element.data().alumnos.forEach(alum => {
+                console.log("hay alumno?");
+                firestore
+                  .collection("users")
+                  .get()
+                  .then(element2 => {
+                    element2.forEach(name => {
+                      console.log("id por alumno ", name.data().email);
+                      if (name.id === alum.id) {
+                        this.alumnosClase.push({
+                          id: name.data().email
+                        });
+                      }
+                    });
+                  });
               });
             }
           });
-        }).catch( error =>{
-          console.log("que hh ", error)
+        })
+        .catch(error => {
+          console.log("que hh ", error);
         });
     },
     detalles() {},
