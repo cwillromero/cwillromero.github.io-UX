@@ -78,7 +78,7 @@ export default {
     };
   },
   mounted: function() {
-    console.log(this.altura);
+    //console.log(this.altura);
   },
   methods: {
     logout: function() {

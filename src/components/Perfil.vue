@@ -5,22 +5,21 @@
         <v-navigation-drawer permanent heigth="100%">
           <v-list-item>
             <v-list-item-content>
-              <v-card max-width="100%">
+              <v-card max-width="100%" color="#C5CAE9">
                 <v-list-item>
                   <v-list-item-content>
                     <v-list-item-title class="nombre">{{email}}</v-list-item-title>
                     <v-list-item-subtitle class="rol">{{rol}}</v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
-
-                <img src="https://cdn.vuetifyjs.com/images/cards/mountain.jpg" class="imgPerfil" />
+                <img src="https://picsum.photos/1920/1080?random" class="imgPerfil" />
               </v-card>
             </v-list-item-content>
           </v-list-item>
 
           <v-divider></v-divider>
 
-          <v-list dense nav>
+          <v-list dense nav >
             <v-list-item v-for="item in $props.clasesN" :key="item.id" link>
               <v-list-item-content @click="printName(item.id,item.nombre)">{{item.nombre}}</v-list-item-content>
             </v-list-item>

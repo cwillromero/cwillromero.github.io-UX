@@ -50,7 +50,7 @@
 
     <div class="contenidoV" v-show="contenidoShow">
       <v-data-table :headers="headers" :items="actividades" sort-by="calories" class="elevation-1">
-        <template v-slot:top>
+        <template v-slot:top >
           <v-toolbar flat color="white">
             <v-toolbar-title>Contenido {{score}}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>

@@ -30,7 +30,7 @@ export default {
     };
   },
   mounted: function() {
-    console.log(firebase.auth().currentUser.email);
+    //console.log(firebase.auth().currentUser.email);
 
     firestore
       .collection("users")
@@ -38,7 +38,7 @@ export default {
       .get()
       .then(querySnapshop => {
         querySnapshop.forEach(doc => {
-          console.log("aqui con ", doc.data());
+          //console.log("aqui con ", doc.data());
           this.rolUser = doc.data().userType;
           this.emailUser = doc.data().email;
           if (this.rolUser === "Alumno") {
@@ -66,10 +66,7 @@ export default {
               .get()
               .then(snap => {
                 snap.forEach(element => {
-                  console.log(
-                    "docente ???",
-                    element.data().docente._key.path.segments[6]
-                  );
+                  //console.log( "docente ???", element.data().docente._key.path.segments[6] );
                   if (element.data().docente._key.path.segments[6] === doc.id) {
                     this.clasesUser.push(element); 
                     this.clasesNombres.push({

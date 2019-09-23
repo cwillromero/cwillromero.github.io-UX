@@ -81,14 +81,14 @@ export default {
   methods: {
     signIn() {
       //this.isLoading = true;
-      console.log("Seción Iniciada aqui");
+      //console.log("Seción Iniciada aqui");
       firebase
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
           //this.isLoading = false;
           //this.$router.push("/");
-          console.log("Seción Iniciada");
+          //console.log("Seción Iniciada");
 
           firestore
             .collection("users")
@@ -99,7 +99,7 @@ export default {
                   this.email === element.data().email &&
                   element.data().password === this.password
                 ) {
-                  console.log("usuario unico aqui!!!!");
+                  //console.log("usuario unico aqui!!!!");
                   if (element.data().userType === "Profesor") {
                     sessionStorage.rol = "Profesor";
                     localStorage.isTeacher = true;
@@ -121,7 +121,7 @@ export default {
           this.snackbar=true;
           this.password="";
           this.email="";
-          console.log("Error Iniciado Sesión");
+          //console.log("Error Iniciado Sesión");
         });
     }
   }
