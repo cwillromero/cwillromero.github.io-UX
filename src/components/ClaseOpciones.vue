@@ -36,7 +36,7 @@
             </v-badge>
           </v-tab>
           <v-tab v-else @click="notificaciones">
-            Notificaciones 
+            Notificaciones
             <v-badge color="green" overlap>
               <template v-slot:badge>
                 <span v-if="messages2 > 0">{{ messages2 }}</span>
@@ -262,6 +262,17 @@
         <v-calendar type="month" now="2019-09-23" value="2019-09-23" :events="events"></v-calendar>
       </v-sheet>
     </div>
+
+    <div v-show="calificacionesShow" class="contenidoV">
+      calificaciones
+      <v-row v-for="alumno in alumnosClase" :key="alumno.id">
+      <v-col> {{alumno.id}}</v-col>
+      <v-col v-for="actividad in actividades" :key="actividad.id"> {{actividad.titulo}}
+        
+        <v-text-field :disabled="!conditionUser" v-model="actividad.ponderacion"> </v-text-field>
+        </v-col>  
+      </v-row>
+    </div>
   </div>
 </template>
 
@@ -297,6 +308,8 @@ export default {
     events: [],
     messages: 0,
     messages2: 0,
+    calificacionesShow: false,
+    alumnosClase: [],
 
     actividades: [],
     select: { state: "1", abbr: "Tarea" },
@@ -501,6 +514,7 @@ export default {
       console.log("estoy en el content");
       this.initialize();
       this.tareasShow = false;
+      this.calificacionesShow = false;
       this.contenidoShow = true;
       this.calendarioShow = false;
     },
@@ -508,10 +522,12 @@ export default {
       this.tareasShow = false;
       this.contenidoShow = false;
       this.calendarioShow = true;
+      this.calificacionesShow = false;
     },
     tareas() {
       console.log("nada");
       this.contenidoShow = false;
+      this.calificacionesShow = false;
       this.tareasShow = true;
       this.calendarioShow = false;
 
@@ -534,7 +550,30 @@ export default {
         });
     },
     calificaciones() {
-      console.log("nada2");
+      this.contenidoShow = false;
+      this.calendarioShow = false;
+      this.tareasShow = false;
+      this.calificacionesShow = true;
+      firestore
+        .collection("classes")
+        .get()
+        .then(snap => {
+          this.alumnosClase = [];
+          snap.forEach(element => {
+            if(element.id === localStorage.id){
+              console.log(element.data().alumnos);
+              element.data().alumnos.forEach(alum =>{
+                console.log("id por alumno ", alum.id);
+
+                this.alumnosClase.push({
+                  id: alum.id
+                });
+              });
+            }
+          });
+        }).catch( error =>{
+          console.log("que hh ", error)
+        });
     },
     detalles() {},
 
