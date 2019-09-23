@@ -18,7 +18,7 @@
 
         <div class="flex-grow-1"></div>
 
-        <v-btn x-small text color="white" @click="cerrarSesion()">Cerrrar Sesión</v-btn>
+        <v-btn x-small text color="white" @click="cerrarSesion">Cerrrar Sesión</v-btn>
 
         <template v-slot:extension>
           <v-tabs align-with-title background-color="transparent">
@@ -87,7 +87,6 @@ export default {
     },
     cerrarSesion(){
       firebase.auth().signOut();
-      this.dialog = false;
       this.$router.push("/login");
     }
   }
