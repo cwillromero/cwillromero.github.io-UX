@@ -23,7 +23,7 @@
         <v-tabs align-with-title background-color="transparent">
           <v-tab @click="contenido">Contenido</v-tab>
           <v-tab @click="tareas">Tareas</v-tab>
-          <v-tab v-if="!$props.conditionUser" @click="calificaciones">Calificar</v-tab>
+          <v-tab v-if="$props.conditionUser" @click="calificaciones">Calificar</v-tab>
           <v-tab v-else @click="calificaciones">Calificaciones</v-tab>
 
           <v-tab @click="calendario">Calendario</v-tab>
